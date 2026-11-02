@@ -161,6 +161,43 @@
       }
     }
   }
+
+  function exportCSV() {
+    let rows = [
+      ['Title', 'Description', 'Created', 'Due Date', 'Story Points', 'Priority', 'Lane']
+    ];
+
+    for (let issue of issues) {
+      rows.push([
+        issue.title,
+        issue.description,
+        issue.creationDate,
+        issue.dueDate,
+        issue.storyPoints,
+        issue.priority,
+        issue.lane
+      ]);
+    }
+
+    let csv = rows
+      .map((row) =>
+        row.map((value) => '"' + String(value ?? '').replaceAll('"', '""') + '"').join(',')
+      )
+      .join('\r\n');
+
+    let blob = new Blob(['\uFEFF' + csv], {
+      type: 'text/csv;charset=utf-8'
+    });
+
+    let url = URL.createObjectURL(blob);
+
+    let link = document.createElement('a');
+    link.href = url;
+    link.download = 'kanban-issues.csv';
+    link.click();
+
+    URL.revokeObjectURL(url);
+  }
 </script>
 
 <svelte:head>
@@ -177,13 +214,23 @@
         </p>
       </div>
 
-      <button
-        type="button"
-        onclick={() => dialog.open()}
-        class="bg-black px-4 py-2 text-sm text-white"
-      >
-        + New Issue
-      </button>
+      <div class="flex gap-3">
+        <button
+          type="button"
+          onclick={exportCSV}
+          class="border border-gray-300 px-4 py-2 text-sm hover:bg-gray-100"
+        >
+          Export CSV
+        </button>
+
+        <button
+          type="button"
+          onclick={() => dialog.open()}
+          class="bg-black px-4 py-2 text-sm text-white"
+        >
+          + New Issue
+        </button>
+      </div>
     </header>
 
     <div class="grid grid-cols-4 gap-4">
