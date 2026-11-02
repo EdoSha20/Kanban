@@ -1,56 +1,60 @@
-# sv
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+# Kanban Board PWA
 
-## Creating a project
+A simple Kanban Board built with SvelteKit and Tailwind CSS.
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Features
 
-```sh
-# create a new project
-npx sv create my-app
-```
+- Four lanes: Backlog, Start / Do, Doing / Progress, Done / Implement
+- Create issues using an HTML dialog
+- Drag and drop issues between lanes
+- Save issues in localStorage
+- Fibonacci story points and priority
+- Due dates with overdue warnings
+- Total story points per lane
+- Export individual issues as ICS calendar files
+- Share issues using the Web Share API
+- Export all issues as CSV
+- Notifications when an issue moves to Done
+- Installable Progressive Web App (PWA)
+- Offline support using a Service Worker
 
-To recreate this project with the same configuration:
+## Technologies
 
-```sh
-# recreate this project
-npx sv@1.2.0 create --template minimal --no-types --add prettier eslint tailwindcss="plugins:typography,forms" --install npm .
-```
+- SvelteKit
+- Svelte 5
+- Tailwind CSS
+- JavaScript
+- date-fns
+- Service Worker
 
-## Adding features
+## Installation
 
-Add features to your project with `sv add`:
-
-```sh
-npx sv add
-```
-
-For example, to add Tailwind CSS:
-
-```sh
-npx sv add tailwindcss
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```sh
+```bash
+npm install
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
 ```
 
-## Building
+## Production
 
-To create a production version of your app:
-
-```sh
+```bash
 npm run build
+npm run preview
 ```
 
-You can preview the production build with `npm run preview`.
+## Usage
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+1. Click **+ New Issue** to create a task.
+2. Drag tasks between the four lanes.
+3. Move a task to **Done / Implement** to receive a notification.
+4. Use **Export ICS**, **Share**, or **Export CSV**.
+5. Install the app from a supported browser.
+
+## Storage
+
+Issues are stored locally in the browser using localStorage.
+No account or database is required.
+
+## Author
+
+Edona Shabaj
