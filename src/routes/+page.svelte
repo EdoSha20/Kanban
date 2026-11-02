@@ -1,6 +1,7 @@
 
 <script>
   import { onMount } from 'svelte';
+  import { format, isBefore, startOfDay, parseISO } from 'date-fns';
   import IssueDialog from '#lib/components/IssueDialog.svelte';
 
   let dialog = $state();
@@ -71,6 +72,7 @@
 
 <main class="min-h-screen bg-white px-8 py-10 text-black">
   <div class="mx-auto max-w-7xl">
+
     <header class="mb-10 flex items-center justify-between">
       <div>
         <h1 class="text-2xl font-semibold">Kanban Board</h1>
@@ -114,6 +116,18 @@
                   class="cursor-grab border border-gray-200 bg-white p-3"
                 >
                   <h3 class="font-medium">{issue.title}</h3>
+
+                  {#if issue.dueDate}
+                    <p class="mt-2 text-xs text-gray-500">
+                      Due: {format(parseISO(issue.dueDate), 'dd.MM.yyyy')}
+                    </p>
+
+                    {#if isBefore(parseISO(issue.dueDate), startOfDay(new Date()))}
+                      <p class="mt-1 text-xs font-semibold text-red-600">
+                        Overdue!
+                      </p>
+                    {/if}
+                  {/if}
 
                   <p class="mt-2 text-sm text-gray-500">
                     {issue.description}
