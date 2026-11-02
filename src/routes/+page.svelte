@@ -138,6 +138,29 @@
 
     URL.revokeObjectURL(url);
   }
+
+  async function shareIssue(issue) {
+    if (!navigator.share) {
+      alert('Sharing is not supported in this browser.');
+      return;
+    }
+
+    try {
+      await navigator.share({
+        title: issue.title,
+        text:
+          issue.title + '\n' +
+          issue.description + '\n' +
+          'Due: ' + issue.dueDate + '\n' +
+          'Priority: ' + issue.priority + '\n' +
+          'Story Points: ' + issue.storyPoints
+      });
+    } catch (error) {
+      if (error.name !== 'AbortError') {
+        alert('Sharing failed.');
+      }
+    }
+  }
 </script>
 
 <svelte:head>
@@ -211,13 +234,23 @@
                     <span>{issue.storyPoints} SP</span>
                   </div>
 
-                  <button
-                    type="button"
-                    onclick={() => exportICS(issue)}
-                    class="mt-3 border border-gray-300 px-2 py-1 text-xs hover:bg-gray-100"
-                  >
-                    Export ICS
-                  </button>
+                  <div class="mt-3 flex gap-2">
+                    <button
+                      type="button"
+                      onclick={() => exportICS(issue)}
+                      class="border border-gray-300 px-2 py-1 text-xs hover:bg-gray-100"
+                    >
+                      Export ICS
+                    </button>
+
+                    <button
+                      type="button"
+                      onclick={() => shareIssue(issue)}
+                      class="border border-gray-300 px-2 py-1 text-xs hover:bg-gray-100"
+                    >
+                      Share
+                    </button>
+                  </div>
                 </div>
               {/if}
             {/each}
