@@ -21,9 +21,13 @@
     }
   });
 
+  function saveIssues() {
+    localStorage.setItem('issues', JSON.stringify(issues));
+  }
+
   function addIssue(issue) {
     issues.push(issue);
-    localStorage.setItem('issues', JSON.stringify(issues));
+    saveIssues();
   }
 
   function getPoints(lane) {
@@ -36,6 +40,28 @@
     }
 
     return total;
+  }
+
+  function dragStart(event, id) {
+    event.dataTransfer.setData('text/plain', String(id));
+  }
+
+  function dragOver(event) {
+    event.preventDefault();
+  }
+
+  function drop(event, lane) {
+    event.preventDefault();
+
+    let id = event.dataTransfer.getData('text/plain');
+
+    for (let issue of issues) {
+      if (String(issue.id) === id) {
+        issue.lane = lane;
+      }
+    }
+
+    saveIssues();
   }
 </script>
 
@@ -64,7 +90,13 @@
 
     <div class="grid grid-cols-4 gap-4">
       {#each lanes as lane (lane)}
-        <section class="min-h-96 border border-gray-200">
+        <section
+          class="min-h-96 border border-gray-200"
+          ondragover={dragOver}
+          ondrop={(event) => drop(event, lane)}
+          role="region"
+          aria-label={lane}
+        >
           <div class="flex items-center justify-between border-b border-gray-200 p-4">
             <h2 class="text-sm font-semibold">{lane}</h2>
             <span class="text-xs text-gray-500">
@@ -75,7 +107,12 @@
           <div class="space-y-3 p-4">
             {#each issues as issue (issue.id)}
               {#if issue.lane === lane}
-                <div class="border border-gray-200 p-3">
+                <div
+                  draggable="true"
+                  ondragstart={(event) => dragStart(event, issue.id)}
+                  role="listitem"
+                  class="cursor-grab border border-gray-200 bg-white p-3"
+                >
                   <h3 class="font-medium">{issue.title}</h3>
 
                   <p class="mt-2 text-sm text-gray-500">
