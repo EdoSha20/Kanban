@@ -92,6 +92,52 @@
 
     saveIssues();
   }
+
+  function exportICS(issue) {
+    if (!issue.dueDate) {
+      return;
+    }
+
+    let date = issue.dueDate.replaceAll('-', '');
+
+    let nextDay = new Date(issue.dueDate + 'T12:00:00');
+    nextDay.setDate(nextDay.getDate() + 1);
+
+    let endDate = format(nextDay, 'yyyyMMdd');
+
+    function escapeText(text) {
+      return String(text || '')
+        .replaceAll('\\', '\\\\')
+        .replaceAll('\n', '\\n')
+        .replaceAll(',', '\\,')
+        .replaceAll(';', '\\;');
+    }
+
+    let ics = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Kanban Board//EN',
+      'BEGIN:VEVENT',
+      'UID:' + issue.id + '@kanban-board',
+      'DTSTAMP:' + format(new Date(), "yyyyMMdd'T'HHmmss'Z'"),
+      'DTSTART;VALUE=DATE:' + date,
+      'DTEND;VALUE=DATE:' + endDate,
+      'SUMMARY:' + escapeText(issue.title),
+      'DESCRIPTION:' + escapeText(issue.description),
+      'END:VEVENT',
+      'END:VCALENDAR'
+    ].join('\r\n');
+
+    let blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+    let url = URL.createObjectURL(blob);
+
+    let link = document.createElement('a');
+    link.href = url;
+    link.download = 'issue-' + issue.id + '.ics';
+    link.click();
+
+    URL.revokeObjectURL(url);
+  }
 </script>
 
 <svelte:head>
@@ -100,7 +146,6 @@
 
 <main class="min-h-screen bg-white px-8 py-10 text-black">
   <div class="mx-auto max-w-7xl">
-
     <header class="mb-10 flex items-center justify-between">
       <div>
         <h1 class="text-2xl font-semibold">Kanban Board</h1>
@@ -165,6 +210,14 @@
                     <span>{issue.priority}</span>
                     <span>{issue.storyPoints} SP</span>
                   </div>
+
+                  <button
+                    type="button"
+                    onclick={() => exportICS(issue)}
+                    class="mt-3 border border-gray-300 px-2 py-1 text-xs hover:bg-gray-100"
+                  >
+                    Export ICS
+                  </button>
                 </div>
               {/if}
             {/each}
