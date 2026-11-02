@@ -51,23 +51,30 @@
     event.preventDefault();
   }
 
-  function showNotification(title) {
+  async function showNotification(title) {
     if (!('Notification' in window)) {
       return;
     }
 
-    if (Notification.permission === 'granted') {
-      new Notification('Issue completed', {
-        body: title + ' is now done!'
-      });
-    } else if (Notification.permission === 'default') {
-      Notification.requestPermission().then((permission) => {
-        if (permission === 'granted') {
-          new Notification('Issue completed', {
-            body: title + ' is now done!'
-          });
-        }
-      });
+    if (Notification.permission === 'default') {
+      await Notification.requestPermission();
+    }
+
+    if (Notification.permission !== 'granted') {
+      return;
+    }
+
+    if ('serviceWorker' in navigator) {
+      try {
+        const registration = await navigator.serviceWorker.ready;
+
+        await registration.showNotification('Issue completed', {
+          body: title + ' is now done!',
+          icon: '/icon-192.png'
+        });
+      } catch (error) {
+        console.error('Notification failed:', error);
+      }
     }
   }
 
@@ -239,7 +246,6 @@
           class="min-h-96 border border-gray-200"
           ondragover={dragOver}
           ondrop={(event) => drop(event, lane)}
-          role="region"
           aria-label={lane}
         >
           <div class="flex items-center justify-between border-b border-gray-200 p-4">
