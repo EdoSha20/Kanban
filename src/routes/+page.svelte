@@ -1,11 +1,19 @@
-
 <script>
+  import IssueDialog from '$lib/components/IssueDialog.svelte';
+
+  let dialog;
+  let issues = $state([]);
+
   let lanes = [
     'Backlog',
     'Start / Do',
     'Doing / Progress',
     'Done / Implement'
   ];
+
+  function addIssue(issue) {
+    issues.push(issue);
+  }
 </script>
 
 <svelte:head>
@@ -18,37 +26,45 @@
     <header class="mb-10 flex items-center justify-between">
       <div>
         <h1 class="text-2xl font-semibold">Kanban Board</h1>
-        <p class="mt-1 text-sm text-zinc-500">
-          Manage your tasks
-        </p>
+        <p class="mt-1 text-sm text-zinc-500">Manage your tasks</p>
       </div>
 
       <button
-        type="button"
-        class="bg-zinc-900 px-4 py-2 text-sm text-white hover:bg-zinc-700"
+        onclick={() => dialog.open()}
+        class="bg-zinc-900 px-4 py-2 text-sm text-white"
       >
         + New Issue
       </button>
     </header>
 
     <div class="grid grid-cols-4 gap-4">
-      {#each lanes as lane}
+      {#each lanes as lane (lane)}
         <section class="min-h-96 border border-zinc-200">
 
-          <div class="flex items-center justify-between border-b border-zinc-200 px-4 py-4">
+          <div class="flex items-center justify-between border-b border-zinc-200 p-4">
             <h2 class="text-sm font-semibold">{lane}</h2>
-            <span class="text-xs text-zinc-500">0 SP</span>
           </div>
 
-          <div class="p-4 text-center">
-            <p class="mt-10 text-sm text-zinc-400">
-              No issues yet
-            </p>
+          <div class="space-y-3 p-4">
+            {#each issues as issue (issue.id)}
+              {#if issue.lane === lane}
+                <div class="border border-zinc-200 p-3">
+                  <h3 class="font-medium">{issue.title}</h3>
+                  <p class="mt-2 text-sm text-zinc-500">
+                    {issue.description}
+                  </p>
+                  <p class="mt-3 text-xs text-zinc-500">
+                    {issue.priority} | {issue.storyPoints} SP
+                  </p>
+                </div>
+              {/if}
+            {/each}
           </div>
 
         </section>
       {/each}
     </div>
-
   </div>
 </main>
+
+<IssueDialog bind:this={dialog} {addIssue} />
