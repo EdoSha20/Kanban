@@ -51,6 +51,26 @@
     event.preventDefault();
   }
 
+  function showNotification(title) {
+    if (!('Notification' in window)) {
+      return;
+    }
+
+    if (Notification.permission === 'granted') {
+      new Notification('Issue completed', {
+        body: title + ' is now done!'
+      });
+    } else if (Notification.permission === 'default') {
+      Notification.requestPermission().then((permission) => {
+        if (permission === 'granted') {
+          new Notification('Issue completed', {
+            body: title + ' is now done!'
+          });
+        }
+      });
+    }
+  }
+
   function drop(event, lane) {
     event.preventDefault();
 
@@ -58,7 +78,15 @@
 
     for (let issue of issues) {
       if (String(issue.id) === id) {
+        let oldLane = issue.lane;
+
         issue.lane = lane;
+
+        if (lane === 'Done / Implement' && oldLane !== lane) {
+          showNotification(issue.title);
+        }
+
+        break;
       }
     }
 
